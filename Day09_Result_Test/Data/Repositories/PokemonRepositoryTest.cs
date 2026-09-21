@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Day09_Result_Test.Data.DataSource;
 using Day09_Result.Data.Common;
@@ -47,5 +48,38 @@ public class PokemonRepositoryTest
         Result<Pokemon, PokemonError> result = await repository.GetPokemonByNameAsync("ditto");
         
         Assert.That(result, Is.InstanceOf<Result<Pokemon, PokemonError>.Error>());
+    }
+
+    [Test]
+    public async Task 과제3_Subway_NotFoundException()
+    {
+        ISubwayApiDataSource dataSource = new NotFoundSubwayMockApiDataSource();
+        ISubwayRepository repository = new SubwayRepository(dataSource);
+        
+        Result<List<Subway>, SubwayError> result = await repository.GetSubwayByNameAsync("김포");
+        
+        Assert.That(result, Is.InstanceOf<Result<Subway, SubwayError>.Error>());
+        var errorResult = (Result<List<Subway>, SubwayError>.Error)result;
+        Assert.That(errorResult.error, Is.EqualTo(SubwayError.NotFound));
+    }
+
+    [Test]
+    public async Task 과제3_Subway_SucessTest()
+    {
+        ISubwayApiDataSource dataSource = new SuccessSubwayMockApiDataSource();
+        ISubwayRepository repository = new SubwayRepository(dataSource);
+        
+        Result<List<Subway>, SubwayError> result = await repository.GetSubwayByNameAsync("서울");
+        
+        Assert.That(result, Is.InstanceOf<Result<Subway, SubwayError>.Success>());
+
+        var subwayResult = (Result<List<Subway>, SubwayError>.Success)result;
+        List<Subway> subways = subwayResult.data;
+        
+        Assert.That(subways, Is.Not.Empty);
+        Assert.That(subways[0].StatnNm, Is.EqualTo("서울"));
+        Assert.That(subways[0].UpdnLine, Is.EqualTo("상행"));
+        Assert.That(subways[0].TrainLineNm, Is.EqualTo("검암행 - 공덕방면"));
+        Assert.That(subways[0].ArvlMsg2, Is.EqualTo("서울 출발"));
     }
 }
