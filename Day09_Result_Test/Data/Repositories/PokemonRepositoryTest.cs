@@ -48,6 +48,8 @@ public class PokemonRepositoryTest
         Result<Pokemon, PokemonError> result = await repository.GetPokemonByNameAsync("ditto");
         
         Assert.That(result, Is.InstanceOf<Result<Pokemon, PokemonError>.Error>());
+        var errorResult = (Result<Pokemon, PokemonError>.Error)result;
+        Assert.That(errorResult.error, Is.EqualTo(PokemonError.JsonSerialization));
     }
 
     [Test]

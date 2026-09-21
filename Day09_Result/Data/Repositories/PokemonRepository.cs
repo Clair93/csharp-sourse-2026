@@ -19,7 +19,11 @@ public class PokemonRepository(IPokemonApiDataSource dataSource) : IPokemonRepos
             {
                 case 200:
                     PokemonDto? pokemonDto = JsonSerializer.Deserialize<PokemonDto>(response.Body);
-                    Pokemon? pokemon = pokemonDto?.ToModel(); 
+                    if (pokemonDto == null)
+                    {
+                        return new Result<Pokemon, PokemonError>.Error(PokemonError.JsonSerialization);
+                    }
+                    Pokemon? pokemon = pokemonDto?.ToModel();
                     return new Result<Pokemon, PokemonError>.Success(pokemon!);
                 case 404:
                     return new Result<Pokemon, PokemonError>.Error(PokemonError.NotFound);
@@ -28,6 +32,10 @@ public class PokemonRepository(IPokemonApiDataSource dataSource) : IPokemonRepos
                 default:
                     return new Result<Pokemon, PokemonError>.Error(PokemonError.Unknown);
             }
+        }
+        catch (JsonException)
+        {
+            return new Result<Pokemon, PokemonError>.Error(PokemonError.JsonSerialization);    
         }
         catch (Exception)
         {
