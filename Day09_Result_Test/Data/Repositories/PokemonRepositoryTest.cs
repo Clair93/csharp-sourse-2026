@@ -58,7 +58,7 @@ public class PokemonRepositoryTest
         
         Result<List<Subway>, SubwayError> result = await repository.GetSubwayByNameAsync("김포");
         
-        Assert.That(result, Is.InstanceOf<Result<Subway, SubwayError>.Error>());
+        Assert.That(result, Is.InstanceOf<Result<List<Subway>, SubwayError>.Error>());
         var errorResult = (Result<List<Subway>, SubwayError>.Error)result;
         Assert.That(errorResult.error, Is.EqualTo(SubwayError.NotFound));
     }
@@ -71,7 +71,7 @@ public class PokemonRepositoryTest
         
         Result<List<Subway>, SubwayError> result = await repository.GetSubwayByNameAsync("서울");
         
-        Assert.That(result, Is.InstanceOf<Result<Subway, SubwayError>.Success>());
+        Assert.That(result, Is.InstanceOf<Result<List<Subway>, SubwayError>.Success>());
 
         var subwayResult = (Result<List<Subway>, SubwayError>.Success)result;
         List<Subway> subways = subwayResult.data;
